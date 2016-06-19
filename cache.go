@@ -123,6 +123,10 @@ func (c *cache) Get(k string) (interface{}, bool) {
 		if time.Now().UnixNano() > item.Expiration {
 			c.mu.RUnlock()
 			return nil, false
+		} else if time.Now().Add(c.defaultExpiration).UnixNano() < item.Expiration {
+			c.mu.RUnlock()
+			c.Delete(k)
+			return nil, false
 		}
 	}
 	c.mu.RUnlock()
